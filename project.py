@@ -2,13 +2,17 @@ import smtplib
 from bs4 import BeautifulSoup
 import requests
 import os
+import schedule
+import time
 from dotenv import load_dotenv
+
+
 
 # Load environment variables from .env file
 load_dotenv()
 
-practice_url = "https://appbrewery.github.io/instant_pot/"
-live_url = "https://www.amazon.in/Hero-Xpulse-Booking-Ex-Showroom-Polestar/dp/B0D9DLZ2DJ/?_encoding=UTF8&pd_rd_w=yRgfw&content-id=amzn1.sym.5e88c7b1-d6dd-463e-95f7-24271869827e&pf_rd_p=5e88c7b1-d6dd-463e-95f7-24271869827e&pf_rd_r=Y2V838QG7T8DFWBKQNGZ&pd_rd_wg=ruT2c&pd_rd_r=94aaa749-8cd6-4ba1-bc48-07041340c773&ref_=pd_hp_d_btf_ls_gwc_pc_en4_"
+
+live_url = "https://www.amazon.com/dp/B075CYMYK6?psc=1&ref_=cm_sw_r_cp_ud_ct_FM9M699VKHTT47YD50Q6"
 
 
 header = {
@@ -32,35 +36,22 @@ response = requests.get(live_url, headers= header)
 soup = BeautifulSoup(response.content, "html.parser")
 # print(soup.prettify())
 
-# # Find the HTML element that contains the price
-# price = soup.find(class_="a-price-whole").get_text()
-#
-# # Remove the dollar sign using split
-# # price_without_currency = price.split("$")[1]
-#
-# # Convert to floating point number
-# price_as_float = float(price)
-# print(price_as_float)
+# Find the HTML element that contains the price
+price = soup.find(class_="a-offscreen").get_text()
 
+# Remove the dollar sign using split
+price_without_currency = price.split("$")[1]
 
-price = soup.find(class_="a-price-whole").get_text()
-
-# Remove commas or other non-numeric characters (except the dot)
-price_clean = price.replace(',', '').strip()
-
-# Convert to float
-price_as_float = float(price_clean)
+# Convert to floating point number
+price_as_float = float(price_without_currency)
 print(price_as_float)
-# except ValueError:
-#     print("Could not convert price to float:", price_clean)
-
 
 # Get the product title
 title = soup.find(id="productTitle").get_text().strip()
 print(title)
 
 # Set the price below which you would like to get a notification
-BUY_PRICE = 1000000
+BUY_PRICE = 100
 
 
 if price_as_float < BUY_PRICE:
@@ -76,4 +67,4 @@ if price_as_float < BUY_PRICE:
             to_addrs=os.environ["EMAIL_ADDRESS"],
             msg=f"Subject:Amazon Price Alert!\n\n{message}\n{live_url}".encode("utf-8")
         )
-
+        

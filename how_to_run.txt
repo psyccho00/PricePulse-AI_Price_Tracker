@@ -1,0 +1,11 @@
+#Run virtual Environment    
+#       .\.venv\Scripts\Activate
+
+#Terminal 1
+#run backend:       python -m uvicorn backend.app.main:app --reload 
+
+            python -m uvicorn backend.app.main:app --reload --port 8001
+
+#Terminal 2
+#run frontend:      python -m streamlit run frontend/app.py
+
